@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: react-app-config
+data:
+  config.js: |
+    window.env = {
+      REACT_APP_API_BASE_URL: "http://spring-boot-app-shivathebravo21114-dev.apps.rm3.7wse.p1.openshiftapps.com"
+    };

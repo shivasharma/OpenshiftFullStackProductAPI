@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-boot-app
+  template:
+    metadata:
+      labels:
+        app: spring-boot-app
+    spec:
+      containers:
+        - name: spring-boot-app
+          image: shivathebravo/react-product-app-spring-boot-app:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/product?createDatabaseIfNotExist=true
+            - name: SPRING_DATASOURCE_USERNAME
+              value: product_user
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: product_user_password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-app
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: spring-boot-app

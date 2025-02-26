@@ -1,0 +1,29 @@
+
+services:
+  mysql:
+    image: shivathebravo/mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: P@ssw0rd
+      MYSQL_USER: product_user
+      MYSQL_PASSWORD: product_user_password
+      MYSQL_DATABASE: product
+
+  spring-boot-app:
+    image: shivathebravo/react-product-app-spring-boot-app:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/product?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: product_user
+      SPRING_DATASOURCE_PASSWORD: product_user_password
+
+  react-app:
+    image: shivathebravo/reactproductapp:17
+    environment:
+      REACT_APP_API_BASE_URL: http://spring-boot-app-shivathebravo21114-dev.apps.rm3.7wse.p1.openshiftapps.com
+    ports:
+      - "3000:80"
