@@ -1,5 +1,6 @@
 package com.example.backend.component;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,9 @@ import org.springframework.web.client.RestTemplate;
 public class DownstreamServiceHealthIndicator implements HealthIndicator {
 
     private final RestTemplate restTemplate;
-    private final String downstreamServiceUrl = "https://api.downstream-service.com/health";
+
+    @Value("${downstream.service.url}") // Externalize the URL in application.properties
+    private String downstreamServiceUrl;
 
     public DownstreamServiceHealthIndicator(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -21,12 +24,21 @@ public class DownstreamServiceHealthIndicator implements HealthIndicator {
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(downstreamServiceUrl, String.class);
             if (response.getStatusCode().is2xxSuccessful()) {
-                return Health.up().withDetail("downstream-service", "Service is healthy").build();
+                return Health.up()
+                        .withDetail("downstream-service", "Service is healthy")
+                        .withDetail("url", downstreamServiceUrl)
+                        .build();
             } else {
-                return Health.down().withDetail("downstream-service", "Service returned status: " + response.getStatusCode()).build();
+                return Health.down()
+                        .withDetail("downstream-service", "Service returned status: " + response.getStatusCode())
+                        .withDetail("url", downstreamServiceUrl)
+                        .build();
             }
         } catch (Exception e) {
-            return Health.down(e).withDetail("downstream-service", "Service is unavailable: " + e.getMessage()).build();
+            return Health.down(e)
+                    .withDetail("downstream-service", "Service is unavailable: " + e.getMessage())
+                    .withDetail("url", downstreamServiceUrl)
+                    .build();
         }
     }
 }
